@@ -1,9 +1,11 @@
+```cpp
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
 
 #include "Pages.h"
 #include "TimePage.h"
 #include "WifiPage.h"
+#include "BatteryPage.h"
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -42,6 +44,7 @@ void setup() {
 
   initTimePage();
   initWifiPage();
+  initBatteryPage();   // 🔋 added
 }
 
 
@@ -56,6 +59,7 @@ void loop() {
   updateCurrentPage();
   drawCurrentPage();
   drawSidebar();
+  drawLowBatteryWarning();   // ⚠️ added
 
   display.display();
 }
@@ -64,14 +68,11 @@ void loop() {
 // =================================================
 // BOOT SCREEN
 // =================================================
-
-
 void showBootScreen() {
 
   display.clearDisplay();
   display.setTextColor(WHITE);
-
-  display.setTextSize(3);   // Bigger size for bold look
+  display.setTextSize(3);
 
   String text = "RDX";
 
@@ -105,6 +106,10 @@ void forwardButtonsToPage(int button) {
     case PAGE_WIFI:
       handleWifiPageButton(button);
       break;
+
+    case PAGE_BATTERY:
+      handleBatteryPageButton(button);
+      break;
   }
 }
 
@@ -128,20 +133,20 @@ void handleButtons() {
     }
 
     if (digitalRead(BTN_RIGHT) == LOW) {
-      forwardButtonsToPage(3);  // NEXT SUB OPTION
+      forwardButtonsToPage(3);
       lastButtonPress = millis();
       return;
     }
 
     if (digitalRead(BTN_LEFT) == LOW) {
-      forwardButtonsToPage(4);  // PREVIOUS SUB OPTION
+      forwardButtonsToPage(4);
       lastButtonPress = millis();
       return;
     }
 
     if (digitalRead(BTN_OK) == LOW) {
       inSubMenu = true;
-      forwardButtonsToPage(2);  // ENTER
+      forwardButtonsToPage(2);
       lastButtonPress = millis();
       return;
     }
@@ -151,26 +156,26 @@ void handleButtons() {
   else {
 
     if (digitalRead(BTN_UP) == LOW) {
-      forwardButtonsToPage(0);  // UP
+      forwardButtonsToPage(0);
       lastButtonPress = millis();
       return;
     }
 
     if (digitalRead(BTN_DOWN) == LOW) {
-      forwardButtonsToPage(1);  // DOWN
+      forwardButtonsToPage(1);
       lastButtonPress = millis();
       return;
     }
 
     if (digitalRead(BTN_LEFT) == LOW) {
-      inSubMenu = false;        // BACK
-      forwardButtonsToPage(5);  // BACK EVENT
+      inSubMenu = false;
+      forwardButtonsToPage(5);
       lastButtonPress = millis();
       return;
     }
 
     if (digitalRead(BTN_OK) == LOW) {
-      forwardButtonsToPage(2);  // SELECT
+      forwardButtonsToPage(2);
       lastButtonPress = millis();
       return;
     }
@@ -192,6 +197,10 @@ void updateCurrentPage() {
     case PAGE_WIFI:
       updateWifiPage();
       break;
+
+    case PAGE_BATTERY:
+      updateBatteryPage();
+      break;
   }
 }
 
@@ -206,12 +215,16 @@ void drawCurrentPage() {
     case PAGE_WIFI:
       drawWifiPage(display);
       break;
+
+    case PAGE_BATTERY:
+      drawBatteryPage(display);
+      break;
   }
 }
 
 
 // =================================================
-// SIDEBAR
+// SIDEBAR (WITH BATTERY ICON)
 // =================================================
 void drawSidebar() {
 
@@ -220,10 +233,46 @@ void drawSidebar() {
 
   for (int i = 0; i < total; i++) {
 
+    int y = i * barHeight;
+
     if (i == currentPage) {
-      display.fillRect(120, i * barHeight, 8, barHeight, WHITE);
+      display.fillRect(120, y, 8, barHeight, WHITE);
     } else {
-      display.drawRect(120, i * barHeight, 8, barHeight, WHITE);
+      display.drawRect(120, y, 8, barHeight, WHITE);
+    }
+
+    // 🔋 Battery icon
+    if (i == PAGE_BATTERY) {
+
+      int bx = 121;
+      int by = y + 6;
+
+      display.drawRect(bx, by, 6, 8, WHITE);
+      display.fillRect(bx + 6, by + 2, 1, 4, WHITE);
+
+      extern int batteryPercent;
+      int level = map(batteryPercent, 0, 100, 0, 4);
+
+      display.fillRect(bx + 1, by + 1, level, 6, WHITE);
     }
   }
 }
+
+
+// =================================================
+// LOW BATTERY WARNING
+// =================================================
+void drawLowBatteryWarning() {
+
+  extern int batteryPercent;
+
+  if (batteryPercent > 15) return;
+
+  display.fillRect(10, 20, 100, 25, BLACK);
+  display.drawRect(10, 20, 100, 25, WHITE);
+
+  display.setTextSize(1);
+  display.setCursor(20, 30);
+  display.print("LOW BATTERY!");
+}
+```
