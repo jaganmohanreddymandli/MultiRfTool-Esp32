@@ -44,21 +44,9 @@ void updateTimePage() {
   if (millis() - lastTick >= 1000) {
     lastTick = millis();
 
-    timeinfo.tm_sec++;
-
-    if (timeinfo.tm_sec >= 60) {
-      timeinfo.tm_sec = 0;
-      timeinfo.tm_min++;
-    }
-
-    if (timeinfo.tm_min >= 60) {
-      timeinfo.tm_min = 0;
-      timeinfo.tm_hour++;
-    }
-
-    if (timeinfo.tm_hour >= 24) {
-      timeinfo.tm_hour = 0;
-    }
+    time_t now;
+    time(&now);
+    localtime_r(&now, &timeinfo);
   }
 }
 
@@ -67,26 +55,32 @@ void drawTimePage(Adafruit_SSD1306 &display) {
 
   display.setTextSize(1);
   display.setCursor(5, 5);
-  display.print("Time");
+  display.print("Date & Time");
   display.drawLine(0, 15, 120, 15, WHITE);
 
-  display.setTextSize(2);
+  display.setTextSize(1);
 
   if (!timeInitialized) {
     display.setCursor(10, 30);
-    display.print("--:--:--");
+    display.print("--/--/---- --:--:--");
     return;
   }
 
-  char timeStr[10];
-  sprintf(timeStr, "%02d:%02d:%02d",
+  char dateTimeStr[25];
+
+  sprintf(dateTimeStr,
+          "%02d/%02d/%04d %02d:%02d:%02d",
+          timeinfo.tm_mday,
+          timeinfo.tm_mon + 1,
+          timeinfo.tm_year + 1900,
           timeinfo.tm_hour,
           timeinfo.tm_min,
           timeinfo.tm_sec);
 
-  display.setCursor(10, 30);
-  display.print(timeStr);
+  display.setCursor(5, 35);
+  display.print(dateTimeStr);
 }
+
 
 // ================= REQUIRED FOR LINKER =================
 void handleTimePageButton(int button) {
