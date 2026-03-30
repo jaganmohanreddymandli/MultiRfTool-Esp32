@@ -1,11 +1,10 @@
-```cpp
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
-
 #include "Pages.h"
 #include "TimePage.h"
 #include "WifiPage.h"
 #include "BatteryPage.h"
+#include "WebControl.h"  
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -41,7 +40,7 @@ void setup() {
   display.clearDisplay();
 
   showBootScreen();
-
+  initWebControl();
   initTimePage();
   initWifiPage();
   initBatteryPage();   // 🔋 added
@@ -60,7 +59,7 @@ void loop() {
   drawCurrentPage();
   drawSidebar();
   drawLowBatteryWarning();   // ⚠️ added
-
+  updateWebControl();
   display.display();
 }
 
@@ -275,4 +274,4 @@ void drawLowBatteryWarning() {
   display.setCursor(20, 30);
   display.print("LOW BATTERY!");
 }
-```
+
