@@ -4,7 +4,8 @@
 #include "TimePage.h"
 #include "WifiPage.h"
 #include "BatteryPage.h"
-#include "WebControl.h"  
+#include "WebControl.h" 
+#include "BluetoothPage.h" 
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -44,6 +45,7 @@ void setup() {
   initTimePage();
   initWifiPage();
   initBatteryPage();   // 🔋 added
+  initBluetoothPage();
 }
 
 
@@ -109,6 +111,9 @@ void forwardButtonsToPage(int button) {
     case PAGE_BATTERY:
       handleBatteryPageButton(button);
       break;
+    // case PAGE_BLUETOOTH:
+    //   handleBluetoothPageButton(button);
+    //   break;
   }
 }
 
@@ -200,6 +205,9 @@ void updateCurrentPage() {
     case PAGE_BATTERY:
       updateBatteryPage();
       break;
+    case PAGE_BLUETOOTH:
+      updateBluetoothPage();
+      break;
   }
 }
 
@@ -217,6 +225,9 @@ void drawCurrentPage() {
 
     case PAGE_BATTERY:
       drawBatteryPage(display);
+      break;
+    case PAGE_BLUETOOTH:
+      drawBluetoothPage(display);
       break;
   }
 }

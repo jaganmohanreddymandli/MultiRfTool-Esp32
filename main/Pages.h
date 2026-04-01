@@ -4,7 +4,8 @@
 enum PageType {
   PAGE_TIME,
   PAGE_WIFI,
-  PAGE_BATTERY,
+  PAGE_BATTERY
+  PAGE_BLUETOOTH,
   PAGE_COUNT
 };
 
