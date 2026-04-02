@@ -111,9 +111,9 @@ void forwardButtonsToPage(int button) {
     case PAGE_BATTERY:
       handleBatteryPageButton(button);
       break;
-    // case PAGE_BLUETOOTH:
-    //   handleBluetoothPageButton(button);
-    //   break;
+    case PAGE_BLUETOOTH:
+      handleBluetoothPageButton(button);
+      break;
   }
 }
 
